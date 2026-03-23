@@ -1,0 +1,159 @@
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight - 100;
+ctx.lineWidth = 2;
+ctx.lineCap = 'round';
+
+let startX, startY;
+let isDrawing = false;
+let lastX, lastY;
+let imgURL = "";
+let isDarkMode = false;
+
+function theme() {
+    if (isDarkMode) {
+        // page colors
+        document.body.style.backgroundColor = "#222";
+        document.body.style.color = "white";
+
+        // canvas
+        ctx.fillStyle = "#222";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "white";
+    } else {
+        document.body.style.backgroundColor = "white";
+        document.body.style.color = "black";
+
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.strokeStyle = "black";
+    }
+}
+
+function saveCanvas() {
+    const url = canvas.toDataURL("image/png");
+    localStorage.setItem("canvasData", url);
+}
+
+window.onload = function () {
+    const savedData = localStorage.getItem("canvasData");
+    if (savedData) {
+        const img = new Image();
+        img.src = savedData;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        };
+    }
+};
+
+let currentTool = "none";
+document.querySelectorAll("button").forEach(button => {
+    button.onclick = () => {
+        document.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        if (button.id === "clear") {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            localStorage.removeItem("canvasData");
+            return;
+        }
+
+        if (button.id == "image") {
+            imgURL = prompt("Enter image URL : ");
+        }
+
+        if (button.id == "darkmode") {
+            isDarkMode = !isDarkMode;
+            theme();
+            saveCanvas();
+            return;
+        }
+
+        currentTool = button.id;
+    };
+});
+
+
+function setPosition(e) {
+    const rect = canvas.getBoundingClientRect();
+    lastX = e.clientX - rect.left;
+    lastY = e.clientY - rect.top;
+}
+
+function startDrawing(e) {
+    setPosition(e);
+    startX = lastX;
+    startY = lastY;
+    isDrawing = true;
+}
+
+function stopDrawing(e) {
+    if (!isDrawing) return;
+    setPosition(e);
+    const width = lastX - startX;
+    const height = lastY - startY;
+
+    if (currentTool == "line") {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(lastX, lastY);
+        ctx.stroke();
+    }
+
+    if (currentTool == "rectangle") {
+        ctx.strokeRect(startX, startY, width, height);
+    }
+
+    else if (currentTool == "square") {
+        const side = Math.max(Math.abs(width), Math.abs(height))
+        ctx.strokeRect(startX, startY, side, side);
+    }
+
+    else if (currentTool == "circle") {
+        const radius = Math.sqrt(width * width + height * height)
+        ctx.beginPath();
+        ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    else if (currentTool == "triangle") {
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(lastX, lastY);
+        ctx.lineTo(startX * 2 - lastX, lastY);
+        ctx.closePath();
+        ctx.stroke();
+    }
+    else if (currentTool == "image") {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = imgURL;
+        img.onload = function () {
+            ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
+            saveCanvas();
+        }
+    }
+
+    isDrawing = false;
+    ctx.beginPath();
+    saveCanvas();
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    if (currentTool === "brush") {
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        setPosition(e);
+        ctx.lineTo(lastX, lastY);
+        ctx.stroke();
+        saveCanvas();
+    }
+
+}
+
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mousemove', draw);
+document.addEventListener('mouseup', stopDrawing); 
