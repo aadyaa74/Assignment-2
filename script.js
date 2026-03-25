@@ -10,14 +10,15 @@ let isDrawing = false;
 let lastX, lastY;
 let imgURL = "";
 let isDarkMode = false;
+let preview;
 
 function theme() {
     if (isDarkMode) {
-        // page colors
+
         document.body.style.backgroundColor = "#222";
         document.body.style.color = "white";
 
-        // canvas
+
         ctx.fillStyle = "#222";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -60,10 +61,6 @@ document.querySelectorAll("button").forEach(button => {
             return;
         }
 
-        if (button.id == "image") {
-            imgURL = prompt("Enter image URL : ");
-        }
-
         if (button.id == "darkmode") {
             isDarkMode = !isDarkMode;
             theme();
@@ -87,13 +84,17 @@ function startDrawing(e) {
     startX = lastX;
     startY = lastY;
     isDrawing = true;
+    preview = ctx.getImageData(0, 0, canvas.width, canvas.height);
 }
 
 function stopDrawing(e) {
+
     if (!isDrawing) return;
     setPosition(e);
     const width = lastX - startX;
     const height = lastY - startY;
+
+    ctx.putImageData(preview, 0, 0);
 
     if (currentTool == "line") {
         ctx.beginPath();
@@ -102,7 +103,7 @@ function stopDrawing(e) {
         ctx.stroke();
     }
 
-    if (currentTool == "rectangle") {
+    else if (currentTool == "rectangle") {
         ctx.strokeRect(startX, startY, width, height);
     }
 
@@ -128,9 +129,9 @@ function stopDrawing(e) {
     }
     else if (currentTool == "image") {
         const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.src = imgURL;
+        img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
         img.onload = function () {
+
             ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
             saveCanvas();
         }
@@ -149,7 +150,46 @@ function draw(e) {
         setPosition(e);
         ctx.lineTo(lastX, lastY);
         ctx.stroke();
-        saveCanvas();
+        return;
+    }
+
+    setPosition(e);
+
+    const width = lastX - startX;
+    const height = lastY - startY;
+
+    ctx.putImageData(preview, 0, 0);
+
+    ctx.beginPath();
+
+    if (currentTool == "line") {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(lastX, lastY);
+        ctx.stroke();
+    }
+
+    else if (currentTool == "rectangle") {
+        ctx.strokeRect(startX, startY, width, height);
+    }
+
+    else if (currentTool == "square") {
+        const side = Math.max(Math.abs(width), Math.abs(height));
+
+        ctx.strokeRect(startX, startY, side, side);
+    }
+
+    else if (currentTool == "circle") {
+        const radius = Math.sqrt(width * width + height * height);
+        ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+
+    else if (currentTool == "triangle") {
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(lastX, lastY);
+        ctx.lineTo(startX * 2 - lastX, lastY);
+        ctx.closePath();
+        ctx.stroke();
     }
 
 }
