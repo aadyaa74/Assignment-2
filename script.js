@@ -39,14 +39,23 @@ function saveCanvas() {
     localStorage.setItem("canvasData", url);
 }
 
+function saveDarkMode() {
+    localStorage.setItem("isDarkMode", isDarkMode);
+}
+
 window.onload = function () {
-    const savedData = localStorage.getItem("canvasData");
-    if (savedData) {
-        const img = new Image();
-        img.src = savedData;
-        img.onload = function () {
-            ctx.drawImage(img, 0, 0);
-        };
+    const dark = localStorage.getItem("isDarkMode");
+    if (dark === "true") {
+        isDarkMode = true;
+        theme();
+        const savedData = localStorage.getItem("canvasData");
+        if (savedData) {
+            const img = new Image();
+            img.src = savedData;
+            img.onload = function () {
+                ctx.drawImage(img, 0, 0);
+            };
+        }
     }
 };
 
@@ -65,6 +74,7 @@ document.querySelectorAll("button").forEach(button => {
             isDarkMode = !isDarkMode;
             theme();
             saveCanvas();
+            saveDarkMode();
             return;
         }
 
@@ -94,7 +104,21 @@ function stopDrawing(e) {
     const width = lastX - startX;
     const height = lastY - startY;
 
+    if (currentTool == "image") {
+        const img = new Image();
+        img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
+        img.onload = function () {
+
+            ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
+            saveCanvas();
+        }
+        isDrawing = false;
+        return;
+    }
+
     ctx.putImageData(preview, 0, 0);
+
+
 
     if (currentTool == "line") {
         ctx.beginPath();
@@ -126,15 +150,6 @@ function stopDrawing(e) {
         ctx.lineTo(startX * 2 - lastX, lastY);
         ctx.closePath();
         ctx.stroke();
-    }
-    else if (currentTool == "image") {
-        const img = new Image();
-        img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
-        img.onload = function () {
-
-            ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
-            saveCanvas();
-        }
     }
 
     isDrawing = false;
@@ -190,6 +205,9 @@ function draw(e) {
         ctx.lineTo(startX * 2 - lastX, lastY);
         ctx.closePath();
         ctx.stroke();
+    }
+    else if (currentTool == "image") {
+        ctx.strokeRect(startX, startY, width, height);
     }
 
 }
