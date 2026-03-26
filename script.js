@@ -110,8 +110,9 @@ function stopDrawing(e) {
         img.crossOrigin = "anonymous";
         img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
         img.onload = function () {
-
-            ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
+            const x = width < 0 ? lastX : startX;
+            const y = height < 0 ? lastY : startY;
+            ctx.drawImage(img, x, y, Math.abs(width), Math.abs(height));
             preview = ctx.getImageData(0, 0, canvas.width, canvas.height);
             saveCanvas();
         }
