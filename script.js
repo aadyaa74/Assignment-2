@@ -119,6 +119,12 @@ function stopDrawing(e) {
         return;
     }
 
+    if (currentTool == "brush") {
+        isDrawing = false;
+        saveCanvas();
+        return;
+    }
+
     ctx.putImageData(preview, 0, 0);
 
 
@@ -154,6 +160,7 @@ function stopDrawing(e) {
         ctx.closePath();
         ctx.stroke();
     }
+
 
     isDrawing = false;
     ctx.beginPath();
