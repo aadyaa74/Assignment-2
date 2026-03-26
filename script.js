@@ -51,6 +51,7 @@ window.onload = function () {
         const savedData = localStorage.getItem("canvasData");
         if (savedData) {
             const img = new Image();
+            img.crossOrigin = "anonymous";
             img.src = savedData;
             img.onload = function () {
                 ctx.drawImage(img, 0, 0);
@@ -106,10 +107,12 @@ function stopDrawing(e) {
 
     if (currentTool == "image") {
         const img = new Image();
+        img.crossOrigin = "anonymous";
         img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
         img.onload = function () {
 
             ctx.drawImage(img, startX, startY, Math.abs(width), Math.abs(height));
+            preview = ctx.getImageData(0, 0, canvas.width, canvas.height);
             saveCanvas();
         }
         isDrawing = false;
