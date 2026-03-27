@@ -15,16 +15,16 @@ let preview;
 function theme() {
     if (isDarkMode) {
 
-        document.body.style.backgroundColor = "#222";
+        document.body.style.backgroundColor = "#3d3d3d";
         document.body.style.color = "white";
 
 
-        ctx.fillStyle = "#222";
+        ctx.fillStyle = "black";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.strokeStyle = "white";
     } else {
-        document.body.style.backgroundColor = "white";
+        document.body.style.backgroundColor = "#f0f4f8";
         document.body.style.color = "black";
 
         ctx.fillStyle = "white";
@@ -48,15 +48,16 @@ window.onload = function () {
     if (dark === "true") {
         isDarkMode = true;
         theme();
-        const savedData = localStorage.getItem("canvasData");
-        if (savedData) {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.src = savedData;
-            img.onload = function () {
-                ctx.drawImage(img, 0, 0);
-            };
-        }
+    }
+
+    const savedData = localStorage.getItem("canvasData");
+    if (savedData) {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.src = savedData;
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        };
     }
 };
 
@@ -108,10 +109,10 @@ function stopDrawing(e) {
     if (currentTool == "image") {
         const img = new Image();
         img.crossOrigin = "anonymous";
+        const x = width < 0 ? lastX : startX;
+        const y = height < 0 ? lastY : startY;
         img.src = `https://picsum.photos/${Math.abs(width)}/${Math.abs(height)}`;
         img.onload = function () {
-            const x = width < 0 ? lastX : startX;
-            const y = height < 0 ? lastY : startY;
             ctx.drawImage(img, x, y, Math.abs(width), Math.abs(height));
             preview = ctx.getImageData(0, 0, canvas.width, canvas.height);
             saveCanvas();
@@ -142,8 +143,10 @@ function stopDrawing(e) {
     }
 
     else if (currentTool == "square") {
-        const side = Math.max(Math.abs(width), Math.abs(height))
-        ctx.strokeRect(startX, startY, side, side);
+        const side = Math.max(Math.abs(width), Math.abs(height));
+        const x = width < 0 ? startX - side : startX;
+        const y = height < 0 ? startY - side : startY;
+        ctx.strokeRect(x, y, side, side);
     }
 
     else if (currentTool == "circle") {
@@ -200,8 +203,9 @@ function draw(e) {
 
     else if (currentTool == "square") {
         const side = Math.max(Math.abs(width), Math.abs(height));
-
-        ctx.strokeRect(startX, startY, side, side);
+        const x = width < 0 ? startX - side : startX;
+        const y = height < 0 ? startY - side : startY;
+        ctx.strokeRect(x, y, side, side);
     }
 
     else if (currentTool == "circle") {
