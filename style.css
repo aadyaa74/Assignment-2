@@ -5,6 +5,8 @@ body {
 }
 
 .toolbar {
+
+    flex-wrap: wrap;
     display: inline-flex;
     gap: 10px;
 
@@ -14,13 +16,14 @@ body {
     background: #a8c4c6;
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: calc(100vw - 280px);
 }
 
 #clear {
     background: #ff6b6b;
     color: white;
-    position: absolute;
-    top: 25px;
+    position: fixed;
+    top: 20px;
     right: 130px;
 
 }
@@ -29,9 +32,9 @@ body {
 #darkmode {
     background: #222;
     color: white;
-    position: absolute;
-    top: 25px;
-    right: 20px;
+    position: fixed;
+    top: 20px;
+    right: 10px;
 
 }
 
