@@ -6,7 +6,7 @@ body {
 
 .topbar {
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
     gap: 10px;
     padding: 20px;
     width: calc(100vw - 40px);
@@ -15,7 +15,7 @@ body {
 .toolbar {
 
     flex-wrap: wrap;
-    display: inline-flex;
+    display: flex;
     gap: 10px;
 
     padding: 15px 20px;
@@ -23,6 +23,13 @@ body {
     border-radius: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     flex: 1;
+}
+
+.right-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+    align-items: center;
 }
 
 #clear {
