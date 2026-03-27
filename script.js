@@ -1,8 +1,26 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+let startX, startY;
+let isDrawing = false;
+let lastX, lastY;
+let imgURL = "";
+let isDarkMode = false;
+let preview;
 function resizeCanvas() {
+    const topbar = document.querySelector('.topbar');
+    const toolbarBottom = topbar.getBoundingClientRect().bottom;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight - 100;
+    canvas.height = window.innerHeight - toolbarBottom;
+    canvas.style.top = toolbarBottom + "px";
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = isDarkMode ? "white" : "black";
+    if (isDarkMode) {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.putImageData(imageData, 0, 0);
 }
 
 resizeCanvas();
@@ -10,12 +28,7 @@ window.addEventListener('resize', resizeCanvas);
 ctx.lineWidth = 2;
 ctx.lineCap = 'round';
 
-let startX, startY;
-let isDrawing = false;
-let lastX, lastY;
-let imgURL = "";
-let isDarkMode = false;
-let preview;
+
 
 function theme() {
     if (isDarkMode) {
