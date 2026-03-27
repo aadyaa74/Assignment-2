@@ -1,7 +1,12 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight - 100;
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight - 100;
+}
+
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 ctx.lineWidth = 2;
 ctx.lineCap = 'round';
 
@@ -48,6 +53,12 @@ window.onload = function () {
     if (dark === "true") {
         isDarkMode = true;
         theme();
+        document.getElementById("darkmode").textContent = "Light Mode";
+    }
+    else {
+        isDarkMode = false;
+        theme();
+        document.getElementById("darkmode").textContent = "Dark Mode";
     }
 
     const savedData = localStorage.getItem("canvasData");
@@ -68,6 +79,14 @@ document.querySelectorAll("button").forEach(button => {
         button.classList.add("active");
         if (button.id === "clear") {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (isDarkMode) {
+                ctx.fillStyle = "black";
+                ctx.strokeStyle = "white";
+            } else {
+                ctx.fillStyle = "white";
+                ctx.strokeStyle = "black";
+            }
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             localStorage.removeItem("canvasData");
             return;
         }
@@ -77,6 +96,7 @@ document.querySelectorAll("button").forEach(button => {
             theme();
             saveCanvas();
             saveDarkMode();
+            button.textContent = isDarkMode ? "Light Mode" : "Dark Mode";
             return;
         }
 
@@ -87,6 +107,9 @@ document.querySelectorAll("button").forEach(button => {
 
 function setPosition(e) {
     const rect = canvas.getBoundingClientRect();
+    if (
+        e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom)
+        return;
     lastX = e.clientX - rect.left;
     lastY = e.clientY - rect.top;
 }
